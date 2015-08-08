@@ -461,7 +461,7 @@ describe('navgiator', function () {
             }).start();
         });
 
-        it('should execute error app', function (done) {
+        it('should send error on invalid error app', function (done) {
             dual.mount(['error', 'app', 'error'], function () {
                 done();
             });
@@ -470,6 +470,23 @@ describe('navgiator', function () {
             });
             dual.mount(['app', 'error'], function (body, ctxt) {
                 ctxt.return({ not: 'function ' });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
+        it('should send error on invalid error app status code', function (done) {
+            dual.mount(['error', 'app', 'error'], function () {
+                done();
+            });
+            dual.mount(['app', 'start'], function (body, ctxt) {
+                ctxt.return('erro', { statusCode: '403' });
+            });
+            dual.mount(['app', 'error'], function (body, ctxt) {
+                ctxt.return(function () {}, { statusCode: '999' });
             });
             dual.navigator(window, {
                 appRoute: ['app']
