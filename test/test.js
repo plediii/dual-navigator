@@ -98,6 +98,21 @@ describe('navgiator', function () {
             }).start();
         });
 
+        it('should send an error event if start response is not a function', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            dual.once(['error', 'navigate', 'navigate', 'here'], function (body, ctxt) {
+                done();
+            });
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return('else');
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
         it('should *not* be closed before requesting the next state', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
             var firstState = {};
