@@ -50,7 +50,7 @@ module.exports = function (Domain, libs) {
                         if (!_.isFunction(app)) {
                             var message = 'App request did not return a start function.';
                             ctxt.error(new Error(message));
-                            throw new Error(message);
+                            return;
                         }
                         return Promise.resolve(closeApp())
                             .then(function () {
@@ -77,8 +77,8 @@ module.exports = function (Domain, libs) {
                         }
                         if (!_.isArray(redirectRoute)) {
                             var message = 'Invalid redirect route: ' + typeof redirectRoute;
-                            ctxt.error(new Error(messsage));
-                            throw new Error(message);
+                            ctxt.error(new Error(message));
+                            return;
                         }
                         if (currentHash() === newHash) {
                             window.history.replaceState(null, null, '#' + redirectRoute.join('/'));
@@ -94,8 +94,8 @@ module.exports = function (Domain, libs) {
                                     var errapp = body;
                                     if (!_.isFunction(errapp)) {
                                         var message = 'Error app request did not return a start function.';
-                                        ctxt.error(new Error(message));
-                                        throw new Error(message);
+                                        ctxt.send(['error', 'app', 'error'], [], new Error(message));
+                                        return;
                                     }
                                     return Promise.resolve(closeApp())
                                         .then(function () {
@@ -113,8 +113,10 @@ module.exports = function (Domain, libs) {
                                     console.error('No application error handler.');
                                 }
                                 else {
-                                    console.error(new Error('' + options.statusCode + ' Bad error application response ' +  body));
-                                    throw new Error(message);
+                                    var message = '' + options.statusCode + ' Bad error application response ' +  body;
+                                    console.error(message);
+                                    ctxt.send(['error', 'app', 'error'], [], new Error(message));
+                                    return;
                                 }
                             });
                     }
