@@ -364,6 +364,22 @@ describe('navgiator', function () {
             dual.send(['navigate', 'navigate', 'here']);
         });
 
+        it('should raise error on invalid redirect route', function (done) {
+            dual.mount(['error', 'navigate', 'navigate', 'here'], function (body) {
+                console.log('error ', body);
+                done();
+            });
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return({ no: 'good' }, { statusCode: '301' });
+            });
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
         it('should remove the location from history', function (done) {
             dual.mount(['app', 'error'], function (body, ctxt) {
                 ctxt.return(function () {
