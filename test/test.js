@@ -98,6 +98,21 @@ describe('navgiator', function () {
             }).start();
         });
 
+        it('should send an error event if start response is not a function', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            dual.once(['error', 'navigate', 'navigate', 'here'], function (body, ctxt) {
+                done();
+            });
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return('else');
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
         it('should *not* be closed before requesting the next state', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
             var firstState = {};
@@ -349,6 +364,21 @@ describe('navgiator', function () {
             dual.send(['navigate', 'navigate', 'here']);
         });
 
+        it('should raise error on invalid redirect route', function (done) {
+            dual.mount(['error', 'navigate', 'navigate', 'here'], function (body) {
+                done();
+            });
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return({ no: 'good' }, { statusCode: '301' });
+            });
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
         it('should remove the location from history', function (done) {
             dual.mount(['app', 'error'], function (body, ctxt) {
                 ctxt.return(function () {
@@ -431,6 +461,40 @@ describe('navgiator', function () {
             }).start();
         });
 
+        it('should send error on invalid error app', function (done) {
+            dual.mount(['error', 'app', 'error'], function () {
+                done();
+            });
+            dual.mount(['app', 'start'], function (body, ctxt) {
+                ctxt.return('erro', { statusCode: '403' });
+            });
+            dual.mount(['app', 'error'], function (body, ctxt) {
+                ctxt.return({ not: 'function ' });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
+        it('should send error on invalid error app status code', function (done) {
+            dual.mount(['error', 'app', 'error'], function () {
+                done();
+            });
+            dual.mount(['app', 'start'], function (body, ctxt) {
+                ctxt.return('erro', { statusCode: '403' });
+            });
+            dual.mount(['app', 'error'], function (body, ctxt) {
+                ctxt.return(function () {}, { statusCode: '999' });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
         it('should execute error app', function (done) {
             dual.mount(['app', 'start'], function (body, ctxt) {
                 ctxt.return('erro', { statusCode: '403' });
@@ -441,6 +505,27 @@ describe('navgiator', function () {
                     return function () {
                         return Promise.resolve();
                     };
+                });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
+        it('should have default no op for error app cleanup', function (done) {
+            dual.mount(['app', 'start'], function (body, ctxt) {
+                ctxt.return('erro', { statusCode: '403' });
+            });
+            dual.mount(['app', 'safeplace'], function (body, ctxt) {
+                console.log('reached safeplace');
+                ctxt.return(function () {});
+                done();
+            });
+            dual.mount(['app', 'error'], function (body, ctxt) {
+                ctxt.return(function () {
+                    ctxt.send(['navigate', 'safeplace'])
                 });
             });
             dual.navigator(window, {
