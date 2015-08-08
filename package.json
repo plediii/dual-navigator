@@ -1,0 +1,32 @@
+{
+  "name": "dual-navigator",
+  "version": "0.0.0",
+  "description": "Route browser applications with dualapi",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/plediii/dual-navigator.git"
+  },
+  "keywords": [
+    "dualapi",
+    "router",
+    "browser"
+  ],
+  "author": "Paul J. Ledbetter III",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/plediii/dual-navigator/issues"
+  },
+  "homepage": "https://github.com/plediii/dual-navigator#readme",
+  "devDependencies": {
+    "bluebird": "^2.9.34",
+    "dualapi": "^1.1.0",
+    "lodash": "^3.10.1"
+  }
+}
