@@ -366,7 +366,6 @@ describe('navgiator', function () {
 
         it('should raise error on invalid redirect route', function (done) {
             dual.mount(['error', 'navigate', 'navigate', 'here'], function (body) {
-                console.log('error ', body);
                 done();
             });
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
@@ -463,6 +462,23 @@ describe('navgiator', function () {
         });
 
         it('should execute error app', function (done) {
+            dual.mount(['error', 'app', 'error'], function () {
+                done();
+            });
+            dual.mount(['app', 'start'], function (body, ctxt) {
+                ctxt.return('erro', { statusCode: '403' });
+            });
+            dual.mount(['app', 'error'], function (body, ctxt) {
+                ctxt.return({ not: 'function ' });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
+        it('should execute error app', function (done) {
             dual.mount(['app', 'start'], function (body, ctxt) {
                 ctxt.return('erro', { statusCode: '403' });
             });
@@ -472,6 +488,23 @@ describe('navgiator', function () {
                     return function () {
                         return Promise.resolve();
                     };
+                });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
+        it('should have default no op for error app cleanup', function (done) {
+            dual.mount(['app', 'start'], function (body, ctxt) {
+                ctxt.return('erro', { statusCode: '403' });
+            });
+            dual.mount(['app', 'error'], function (body, ctxt) {
+                ctxt.return(function () {
+                    done();
+                    return;
                 });
             });
             dual.navigator(window, {
