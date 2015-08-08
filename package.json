@@ -6,9 +6,10 @@
   "directories": {
     "test": "test"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+    "scripts": {
+        "test": "mocha",
+        "ci-test": "istanbul cover _mocha -- -R tap \"./test/*.js\" > test.tap && istanbul report clover"
+    },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/plediii/dual-navigator.git"
@@ -27,6 +28,9 @@
   "devDependencies": {
     "bluebird": "^2.9.34",
     "dualapi": "^1.1.0",
-    "lodash": "^3.10.1"
+    "istanbul": "^0.3.17",
+    "lodash": "^3.10.1",
+    "mocha": "^2.2.5",
+    "tape": "^4.0.3"
   }
 }
