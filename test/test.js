@@ -518,10 +518,14 @@ describe('navgiator', function () {
             dual.mount(['app', 'start'], function (body, ctxt) {
                 ctxt.return('erro', { statusCode: '403' });
             });
+            dual.mount(['app', 'safeplace'], function (body, ctxt) {
+                console.log('reached safeplace');
+                ctxt.return(function () {});
+                done();
+            });
             dual.mount(['app', 'error'], function (body, ctxt) {
                 ctxt.return(function () {
-                    done();
-                    return;
+                    ctxt.send(['navigate', 'safeplace'])
                 });
             });
             dual.navigator(window, {
