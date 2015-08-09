@@ -56,7 +56,12 @@ module.exports = function (Domain, libs) {
                         }
                         return Promise.resolve(closeApp())
                             .then(function () {
+                                closeApp = function () {}; // prevent reclosure
                                 cleanPage();
+                                if (appLock !== thisLock) {
+                                    // a new navigation event occured before we could load the app
+                                    return;
+                                }
                                 closeApp = app();
                                 if (!_.isFunction(closeApp)) {
                                     closeApp = function () {

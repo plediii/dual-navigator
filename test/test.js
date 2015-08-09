@@ -460,6 +460,135 @@ describe('navgiator', function () {
                 , globals: {}
             }).start();
         });
+
+        it('should not load application if new navigation before previous close completes', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            dual.mount(['app', 'navigate', 'here', 'finally'], function (body, ctxt) {
+                done();
+            });
+            dual.mount(['app', 'navigate', 'there'], function (body, ctxt) {
+                ctxt.return(function () {
+                    done('should not have loaded this app');
+                });
+            });
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return(function () {
+                    dual.send(['navigate', 'navigate', 'there']);
+                    return function () {
+                        dual.send(['navigate', 'navigate', 'here', 'finally']);
+                    };
+                }, { statusCode: 200 });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
+        it('should still clean page even if new navigation before previous close completes', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            var cleaned = false;
+            var firstAppLoaded = false;
+            dual.mount(['app', 'navigate', 'here', 'finally'], function (body, ctxt) {
+                assert(cleaned);
+                done();
+            });
+            dual.mount(['app', 'navigate', 'there'], function (body, ctxt) {
+                ctxt.return(function () {
+                    done('should not have loaded this app');
+                });
+            });
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return(function () {
+                    firstAppLoaded = true;
+                    dual.send(['navigate', 'navigate', 'there']);
+                    return function () {
+                        dual.send(['navigate', 'navigate', 'here', 'finally']);
+                    };
+                }, { statusCode: 200 });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+                , cleanPage: function () {
+                    if (firstAppLoaded) {
+                        cleaned = true;
+                    }
+                }
+            }).start();
+        });
+
+        it('should not load application if new navigation before previous close resolves', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            dual.mount(['app', 'navigate', 'here', 'finally'], function (body, ctxt) {
+                done();
+            });
+            dual.mount(['app', 'navigate', 'there'], function (body, ctxt) {
+                ctxt.return(function () {
+                    done('should not have loaded this app');
+                });
+            });
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return(function () {
+                    dual.send(['navigate', 'navigate', 'there']);
+                    return function () {
+                        return new Promise(function (resolve, reject) {
+                            dual.send(['navigate', 'navigate', 'here', 'finally']);
+                            resolve();
+                        });
+                    };
+                }, { statusCode: 200 });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
+        it('should not reclose first app if navigation before previous close resolves', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            var cleaned = false;
+            var firstAppClosed = false;
+            dual.mount(['app', 'navigate', 'here', 'finally'], function (body, ctxt) {
+                assert(firstAppClosed);
+                ctxt.return(function () {});
+                done();
+            });
+            dual.mount(['app', 'navigate', 'then', 'here'], function (body, ctxt) {
+                ctxt.return(function () {
+                    dual.send(['navigate', 'navigate', 'here', 'finally']);
+                    assert(firstAppClosed);
+                });
+            });
+            dual.mount(['app', 'navigate', 'there'], function (body, ctxt) {
+                ctxt.return(function () {
+                    done('should not have loaded this app');
+                });
+            });
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return(function () {
+                    dual.send(['navigate', 'navigate', 'there']);
+                    return function () {
+                        assert(!firstAppClosed);
+                        firstAppClosed = true;
+                        return new Promise(function (resolve) {
+                            dual.send(['navigate', 'navigate', 'then', 'here']);
+                            resolve();
+                        });
+                    };
+                }, { statusCode: 200 });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+                , cleanPage: function () {
+                }
+            }).start();
+        });
     });
 
     describe('redirect status code', function () {
