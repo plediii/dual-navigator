@@ -84,7 +84,8 @@ module.exports = function (Domain, libs) {
                         }
                     }
                     else {
-                        ctxt.error('' + options.statusCode + ' : ' + body);
+                        var message = '' + options.statusCode + ' : ' + body;
+                        ctxt.error(message);
                         d.request(['app', 'error'], _.extend({}, globals, { error: message }), { timeout: 0.1 })
                             .spread(function (body, options) {
                                 if (options.statusCode == '200') {
