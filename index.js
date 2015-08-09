@@ -63,7 +63,7 @@ module.exports = function (Domain, libs) {
                             });
                     }
                     else if (options.statusCode == 301
-                             || options.statusCode == 504) {
+                             || options.statusCode == 503) {
                         var redirectRoute;
                         if (options.statusCode == 301) {
                             redirectRoute = body;
@@ -105,8 +105,7 @@ module.exports = function (Domain, libs) {
                                             };
                                         });
                                 }
-                                else if (options.statusCode == 504
-                                         || options.statusCode == 408) {
+                                else if (options.statusCode == 504) {
                                     console.error('No application error handler.');
                                 }
                                 else {
