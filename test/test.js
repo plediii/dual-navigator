@@ -22,7 +22,7 @@ var mockApp = function (state) {
                     state.closed = true;
                     return Promise.resolve();
                 };
-            }, { statusCode: '200' });
+            }, { statusCode: 200 });
         }, 1);
     };
 };
@@ -89,7 +89,7 @@ describe('navgiator', function () {
                     done();
                     return function () {
                     };
-                }, { statusCode: '200' });
+                }, { statusCode: 200 });
             });
             dual.navigator(window, {
                 appRoute: ['app']
@@ -124,7 +124,7 @@ describe('navgiator', function () {
                     return function () {
                         return Promise.resolve();
                     };
-                }, { statusCode: '200' });
+                }, { statusCode: 200 });
             });
             dual.navigator(window, {
                 appRoute: ['app']
@@ -145,7 +145,7 @@ describe('navgiator', function () {
                     return function () {
                         return Promise.resolve();
                     };
-                }, { statusCode: '200' });
+                }, { statusCode: 200 });
             });
             dual.navigator(window, {
                 appRoute: ['app']
@@ -170,7 +170,7 @@ describe('navgiator', function () {
                     return function () {
                         return Promise.resolve();
                     };
-                }, { statusCode: '200' });
+                }, { statusCode: 200 });
             });
             dual.navigator(window, {
                 appRoute: ['app']
@@ -194,7 +194,7 @@ describe('navgiator', function () {
                     return function () {
                         return Promise.resolve();
                     };
-                }, { statusCode: '200' });
+                }, { statusCode: 200 });
             });
             dual.navigator(window, {
                 appRoute: ['app']
@@ -214,7 +214,7 @@ describe('navgiator', function () {
                         done();
                         return Promise.resolve();
                     };
-                }, { statusCode: '200' });
+                }, { statusCode: 200 });
             });
             dual.mount(['app', 'then', 'navigate', 'there'], mockApp(secondState));
             dual.navigator(window, {
@@ -235,7 +235,7 @@ describe('navgiator', function () {
                         done();
                         return Promise.resolve();
                     };
-                }, { statusCode: '200' });
+                }, { statusCode: 200 });
             });
             dual.mount(['app', 'then', 'navigate', 'there'], mockApp(secondState));
             dual.navigator(window, {
@@ -260,7 +260,7 @@ describe('navgiator', function () {
                     return function () {
                         return Promise.resolve();
                     };
-                }, { statusCode: '200' });
+                }, { statusCode: 200 });
             });
             dual.navigator(window, {
                 appRoute: ['app']
@@ -284,7 +284,7 @@ describe('navgiator', function () {
                     return function () {
                         return Promise.resolve();
                     };
-                }, { statusCode: '200' });
+                }, { statusCode: 200 });
             });
             dual.navigator(window, {
                 appRoute: ['app']
@@ -345,7 +345,7 @@ describe('navgiator', function () {
 
         it('should induce navigation to the redirect route', function (done) {
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
-                ctxt.return(['redirect', 'there'], { statusCode: '301' });
+                ctxt.return(['redirect', 'there'], { statusCode: 301 });
             });
             dual.once(['app', 'redirect', 'there'], function () {
                 done();
@@ -369,7 +369,7 @@ describe('navgiator', function () {
                 done();
             });
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
-                ctxt.return({ no: 'good' }, { statusCode: '301' });
+                ctxt.return({ no: 'good' }, { statusCode: 301 });
             });
             window.history.pushState(null, null, 'somepage#navigate/here');
             dual.navigator(window, {
@@ -389,7 +389,7 @@ describe('navgiator', function () {
                 done();
             });
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
-                ctxt.return(['redirect', 'there'], { statusCode: '301' });
+                ctxt.return(['redirect', 'there'], { statusCode: 301 });
             });
             dual.mount(['app', 'redirect', 'there'], function (body, ctxt) {
                 ctxt.return(function () {
@@ -415,7 +415,7 @@ describe('navgiator', function () {
             });
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
                 setTimeout(function () {
-                    ctxt.return(['redirect', 'there'], { statusCode: '301' });
+                    ctxt.return(['redirect', 'there'], { statusCode: 301 });
                 }, 10);
             });
             dual.mount(['app', 'redirect', 'there'], function (body, ctxt) {
@@ -486,7 +486,7 @@ describe('navgiator', function () {
                 ctxt.return('erro', { statusCode: 403 });
             });
             dual.mount(['app', 'error'], function (body, ctxt) {
-                ctxt.return(function () {}, { statusCode: '999' });
+                ctxt.return(function () {}, { statusCode: 999 });
             });
             dual.navigator(window, {
                 appRoute: ['app']
