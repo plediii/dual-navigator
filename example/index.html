@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>dual-navigator example</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <article>
+            <header>
+                <h1> dual-navigator example</h1>
+            </header>
+            <div class="app">
+            </div>
+            <footer>
+
+                <p>
+                    Here are some mock documents without state:
+                </p>
+                <ul>
+                    <li><a href="#document/hello">document/hello</a></li>
+                    <li><a href="#document/hello/world">document/hello/world</a></li>
+                    <li><a href="#document/foo/bar">document/foo/bar</a></li>
+                </ul>
+                <hr>
+                <p>
+                    Here are some mock documents with state which must
+                    be asynchronously closed before moving to the next state.
+                </p>
+                <ul>
+                    <li><a href="#stateful/hello">stateful/hello</a></div></li>
+                    <li><a href="#stateful/hello/world">stateful/hello/world</a></div></li>
+                    <li><a href="#stateful/foo/bar">stateful/foo/bar</a></div></li>
+                </ul>
+                <hr>
+                <p>
+                    Here are some links which will be redirected.  Note
+                    that the redirect address will not appear in the
+                    browser history.
+                </p>
+                <ul>
+                    <li><a href="#redirect/document/hello">redirect/document/hello</a></li>
+                    <li><a href="#redirect/document/hello/world">redirect/document/hello/world</a></li>
+                    <li><a href="#redirect/stateful/hello">redirect/stateful/hello</a></li>
+                </ul>
+                <hr>
+                <p>
+                    The following routes will fail to load
+                </p>
+                <ul>
+                    <li>This route does not exist: <a href="#wrong/turn">wrong/turn</a></li>
+                    <li>This route will fail to respond: <a href="#throw/woah/there">throw/woah/there</a></li>
+                    <li>This route will respond incorrectly: <a href="#bad/route">bad/route</a></li>
+                </ul>
+            </footer>
+      </article>
+      <script src="app.js"></script>
+  </body>
+</html>
