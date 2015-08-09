@@ -444,7 +444,7 @@ describe('navgiator', function () {
 
         it('should redirect to error app state', function (done) {
             dual.mount(['app', 'start'], function (body, ctxt) {
-                ctxt.return('error', { statusCode: '403' });
+                ctxt.return('error', { statusCode: 403 });
             });
             dual.mount(['app', 'error'], function (body, ctxt) {
                 done();
@@ -466,7 +466,7 @@ describe('navgiator', function () {
                 done();
             });
             dual.mount(['app', 'start'], function (body, ctxt) {
-                ctxt.return('erro', { statusCode: '403' });
+                ctxt.return('erro', { statusCode: 403 });
             });
             dual.mount(['app', 'error'], function (body, ctxt) {
                 ctxt.return({ not: 'function ' });
@@ -483,7 +483,7 @@ describe('navgiator', function () {
                 done();
             });
             dual.mount(['app', 'start'], function (body, ctxt) {
-                ctxt.return('erro', { statusCode: '403' });
+                ctxt.return('erro', { statusCode: 403 });
             });
             dual.mount(['app', 'error'], function (body, ctxt) {
                 ctxt.return(function () {}, { statusCode: '999' });
@@ -497,7 +497,7 @@ describe('navgiator', function () {
 
         it('should execute error app', function (done) {
             dual.mount(['app', 'start'], function (body, ctxt) {
-                ctxt.return('erro', { statusCode: '403' });
+                ctxt.return('erro', { statusCode: 403 });
             });
             dual.mount(['app', 'error'], function (body, ctxt) {
                 ctxt.return(function () {
@@ -516,7 +516,7 @@ describe('navgiator', function () {
 
         it('should have default no op for error app cleanup', function (done) {
             dual.mount(['app', 'start'], function (body, ctxt) {
-                ctxt.return('erro', { statusCode: '403' });
+                ctxt.return('erro', { statusCode: 403 });
             });
             dual.mount(['app', 'safeplace'], function (body, ctxt) {
                 console.log('reached safeplace');
@@ -537,7 +537,7 @@ describe('navgiator', function () {
 
         it('should redirect to error app state with error message', function (done) {
             dual.mount(['app', 'start'], function (body, ctxt) {
-                ctxt.return('erro', { statusCode: '403' });
+                ctxt.return('erro', { statusCode: 403 });
             });
             dual.mount(['app', 'error'], function (body, ctxt) {
                 assert(ctxt.body.hasOwnProperty('error'));
@@ -560,7 +560,7 @@ describe('navgiator', function () {
                 done();
             });
             dual.mount(['app', 'start'], function (body, ctxt) {
-                ctxt.return('erro', { statusCode: '403' });
+                ctxt.return('erro', { statusCode: 403 });
             });
             dual.mount(['app', 'error'], function (body, ctxt) {
                 ctxt.return(function () {
@@ -582,7 +582,7 @@ describe('navgiator', function () {
 
         it('should be reached for any unavailable page', function (done) {
             dual.mount(['app', 'start'], function (body, ctxt) {
-                ctxt.return('erro', { statusCode: '503' });
+                ctxt.return('erro', { statusCode: 503 });
             });
             dual.mount(['app', 'index'], function () {
                 done();
@@ -643,7 +643,7 @@ describe('navgiator', function () {
         it('should be broadcast as body with error app request', function (done) {
             dual.mount(['app', 'index'], function () {});
             dual.mount(['app', 'start'], function (body, ctxt) {
-                ctxt.return('erro', { statusCode: '403' });
+                ctxt.return('erro', { statusCode: 403 });
             });
             dual.mount(['app', 'error'], function (body, ctxt) {
                 assert.equal(ctxt.body.kindof, 'alot');
