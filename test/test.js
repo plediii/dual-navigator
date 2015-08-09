@@ -10,23 +10,6 @@ var mockWindow = require('./mock-window');
 var dualapi = require('dualapi')
 .use(require('../index'));
 
-var mockApp = function (state) {
-    state = state || {};
-    return function (body, ctxt) {
-        state.called = true;
-        setTimeout(function () {
-            state.replied = true;
-            ctxt.return(function () {
-                state.run = true;
-                return function () {
-                    state.closed = true;
-                    return Promise.resolve();
-                };
-            }, { statusCode: 200 });
-        }, 1);
-    };
-};
-
 describe('navgiator', function () {
 
     var window, dual, n;
@@ -67,7 +50,7 @@ describe('navgiator', function () {
 
         it('should induce app state change when changed', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
-            dual.mount(['app', 'navigate', 'here'], mockApp());
+            dual.mount(['app', 'navigate', 'here'], function () {});
             dual.once(['app', 'then', 'navigate', 'there'], function () {
                 done();
             });
@@ -115,10 +98,16 @@ describe('navgiator', function () {
 
         it('should *not* be closed before requesting the next state', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
-            var firstState = {};
-            dual.mount(['app', 'navigate', 'here'], mockApp(firstState));
+            var firstStateClosed = false;
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return(function () {
+                    return function () {
+                        firstStateClosed = true;
+                    };
+                });
+            });
             dual.mount(['app', 'then', 'navigate', 'there'], function (body, ctxt) {
-                assert(!firstState.closed);
+                assert(!firstStateClosed);
                 done();
                 ctxt.return(function () {
                     return function () {
@@ -136,11 +125,18 @@ describe('navgiator', function () {
 
         it('should be closed before starting the next state', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
-            var firstState = {};
-            dual.mount(['app', 'navigate', 'here'], mockApp(firstState));
+            var firstStateClosed = false;
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                return ctxt.return(function () {
+                    window.location.hash = 'then/navigate/there';
+                    return function () {
+                        firstStateClosed = true;
+                    };
+                });
+            });
             dual.mount(['app', 'then', 'navigate', 'there'], function (body, ctxt) {
                 return ctxt.return(function () {
-                    assert(firstState.closed);
+                    assert(firstStateClosed);
                     done();
                     return function () {
                         return Promise.resolve();
@@ -155,10 +151,9 @@ describe('navgiator', function () {
                 , indexRoute: ['index']
                 , globals: {}
             }).start();
-            window.location.hash = 'then/navigate/there';
         });
 
-        it('should be interpreted as synchronous closure if not close function', function (done) {
+        it('should be interpreted as already closed if no close function', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
             var firstState = {};
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
@@ -206,46 +201,79 @@ describe('navgiator', function () {
 
         it('should be closed after receiving the next state', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
-            var secondState = {};
+            var secondStateReplied = false;
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
                 return ctxt.return(function () {
+                    window.location.hash = 'then/navigate/there';
                     return function () {
-                        assert(secondState.replied);
+                        assert(secondStateReplied);
                         done();
                         return Promise.resolve();
                     };
                 }, { statusCode: 200 });
             });
-            dual.mount(['app', 'then', 'navigate', 'there'], mockApp(secondState));
+            dual.mount(['app', 'then', 'navigate', 'there'], function (body, ctxt) {
+                ctxt.return(function () {});
+                secondStateReplied = true
+            });
             dual.navigator(window, {
                 appRoute: ['app']
                 , indexRoute: ['index']
                 , globals: {}
             }).start();
-            window.location.hash = 'then/navigate/there';
         });
 
         it('should be closed before running the next state', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
-            var secondState = {};
+            var secondStateRun = false;
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
                 return ctxt.return(function () {
+                    window.location.hash = 'then/navigate/there';
                     return function () {
-                        assert(!secondState.run);
+                        assert(!secondStateRun);
                         done();
                         return Promise.resolve();
                     };
                 }, { statusCode: 200 });
             });
-            dual.mount(['app', 'then', 'navigate', 'there'], mockApp(secondState));
+            dual.mount(['app', 'then', 'navigate', 'there'], function (body, ctxt) {
+                return ctxt.return(function () {
+                    secondStateRun = true;
+                });
+            });
             dual.navigator(window, {
                 appRoute: ['app']
                 , indexRoute: ['index']
                 , globals: {}
             }).start();
-            window.location.hash = 'then/navigate/there';
         });
-        
+
+        it('should be run after resolving first state closure', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            var firstStateCloseResolved = false;
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                return ctxt.return(function () {
+                    window.location.hash = 'then/navigate/there';
+                    return function () {
+                        return new Promise(function (resolve) {
+                            firstStateCloseResolved = true;
+                            resolve();
+                        });
+                    };
+                }, { statusCode: 200 });
+            });
+            dual.mount(['app', 'then', 'navigate', 'there'], function (body, ctxt) {
+                return ctxt.return(function () {
+                    assert(firstStateCloseResolved);
+                    done();
+                });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });        
     });
 
     describe('page clean', function () {
@@ -274,9 +302,14 @@ describe('navgiator', function () {
 
         it('should happen before starting the next state', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
-            var firstState = {};
+            var firstStateRun = false;
             var cleaned = false;
-            dual.mount(['app', 'navigate', 'here'], mockApp(firstState));
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return(function () {
+                    firstStateRun = true;
+                    window.location.hash = 'then/navigate/there';
+                });
+            });
             dual.mount(['app', 'then', 'navigate', 'there'], function (body, ctxt) {
                 ctxt.return(function () {
                     assert(cleaned);
@@ -291,20 +324,90 @@ describe('navgiator', function () {
                 , indexRoute: ['index']
                 , globals: {}
                 , cleanPage: function () {
-                    if (firstState.run) {
+                    if (firstStateRun) {
                         cleaned = true;
                     }
                 }
             }).start();
             dual.once(['app'])
-            window.location.hash = 'then/navigate/there';
         });        
+
+        it('should happen after closing first state', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            var firstStateRun = false;
+            var firstStateClosed = false;
+            var cleaned = false;
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return(function () {
+                    window.location.hash = 'then/navigate/there';
+                    firstStateRun = true;
+                    return function () {
+                        firstStateClosed = true;
+                    };
+                });
+            });
+            dual.mount(['app', 'then', 'navigate', 'there'], function (body, ctxt) {
+                ctxt.return(function () {
+                    assert(cleaned);
+                    done();
+                });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+                , cleanPage: function () {
+                    if (firstStateRun) {
+                        assert(firstStateClosed);
+                        cleaned = true;
+                    }
+                }
+            }).start();
+            dual.once(['app'])
+        });
+
+        it('should happen after resolving first state close', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            var firstStateRun = false;
+            var firstStateCloseResolved = false;
+            var cleaned = false;
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                ctxt.return(function () {
+                    window.location.hash = 'then/navigate/there';
+                    firstStateRun = true;
+                    return function () {
+                        return new Promise(function (resolve) {
+                            firstStateCloseResolved = true;
+                            resolve();
+                        });
+                    };
+                });
+            });
+            dual.mount(['app', 'then', 'navigate', 'there'], function (body, ctxt) {
+                ctxt.return(function () {
+                    assert(cleaned);
+                    done();
+                });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+                , cleanPage: function () {
+                    if (firstStateRun) {
+                        assert(firstStateCloseResolved);
+                        cleaned = true;
+                    }
+                }
+            }).start();
+            dual.once(['app'])
+        });
     });
 
     describe('navigation events', function () {
 
         it('should induce app state fetch', function (done) {
-            dual.mount(['app', 'start'], mockApp());
+            dual.mount(['app', 'start'], function () {});
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
                 done();
                 ctxt.return(function () {
@@ -322,7 +425,7 @@ describe('navgiator', function () {
         });
 
         it('should induce hash change on window', function (done) {
-            dual.mount(['app', 'start'], mockApp());
+            dual.mount(['app', 'start'], function () {});
             dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
                 assert.equal(window.location.hash, '#navigate/here');
                 done();
@@ -338,6 +441,24 @@ describe('navgiator', function () {
                 , globals: {}
             }).start();
             dual.send(['navigate', 'navigate', 'here']);
+        });
+
+        it('should not load application if new navigation before load', function (done) {
+            window.history.pushState(null, null, 'somepage#navigate/here');
+            dual.mount(['app', 'navigate', 'there'], function (body, ctxt) {
+                done();
+            });
+            dual.mount(['app', 'navigate', 'here'], function (body, ctxt) {
+                dual.send(['navigate', 'navigate', 'there']);
+                ctxt.return(function () {
+                    done('should not have loaded');
+                }, { statusCode: 200 });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
         });
     });
 
@@ -519,7 +640,6 @@ describe('navgiator', function () {
                 ctxt.return('erro', { statusCode: 403 });
             });
             dual.mount(['app', 'safeplace'], function (body, ctxt) {
-                console.log('reached safeplace');
                 ctxt.return(function () {});
                 done();
             });
