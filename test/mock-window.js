@@ -89,10 +89,12 @@ module.exports = function (startURL) {
                     if (v[0] === '#') {
                         v = v.slice(1);
                     }
-                    var newLocation = parseLocation(history[history.length - 1], '#' + v);
-                    history.push(newLocation);
-                    setLocation(newLocation);
-                    events.emit('hashchange');
+                    process.nextTick(function () {
+                        var newLocation = parseLocation(history[history.length - 1], '#' + v);
+                        history.push(newLocation);
+                        setLocation(newLocation);
+                        events.emit('hashchange');
+                    });
                 }
                 , get: function () {
                     return locationObj._hash;

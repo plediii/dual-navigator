@@ -81,10 +81,8 @@ module.exports = function (Domain, libs) {
                             ctxt.error('Invalid redirect route: ' + typeof redirectRoute);
                             return;
                         }
-                        if (currentHash() === newHash) {
-                            window.history.replaceState(null, null, '#' + redirectRoute.join('/'));
-                            d.send(['navigate'].concat(redirectRoute), []);
-                        }
+                        window.history.replaceState(null, null, '#' + redirectRoute.join('/'));
+                        return d.send(['navigate'].concat(redirectRoute), []);
                     }
                     else {
                         var message = '' + options.statusCode + ' : ' + body;
@@ -108,7 +106,7 @@ module.exports = function (Domain, libs) {
                                             };
                                         });
                                 }
-                                else if (options.statusCode == 504) {
+                                else if (options.statusCode == 503) {
                                     console.error('No application error handler.');
                                 }
                                 else {
