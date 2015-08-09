@@ -106,7 +106,7 @@ module.exports = function (Domain, libs) {
                                             };
                                         });
                                 }
-                                else if (options.statusCode == 504) {
+                                else if (options.statusCode == 503) {
                                     console.error('No application error handler.');
                                 }
                                 else {
