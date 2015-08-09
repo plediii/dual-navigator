@@ -48,8 +48,7 @@ module.exports = function (Domain, libs) {
                     if (options.statusCode == '200') {
                         var app = body;
                         if (!_.isFunction(app)) {
-                            var message = 'App request did not return a start function.';
-                            ctxt.error(new Error(message));
+                            ctxt.error('App request did not return a start function.');
                             return;
                         }
                         return Promise.resolve(closeApp())
@@ -73,11 +72,10 @@ module.exports = function (Domain, libs) {
                             redirectRoute = indexRoute;
                         }
                         else {
-                            return ctxt.error(new Error('Index route is not available'));
+                            return ctxt.error('Index route is not available');
                         }
                         if (!_.isArray(redirectRoute)) {
-                            var message = 'Invalid redirect route: ' + typeof redirectRoute;
-                            ctxt.error(new Error(message));
+                            ctxt.error('Invalid redirect route: ' + typeof redirectRoute);
                             return;
                         }
                         if (currentHash() === newHash) {
@@ -87,14 +85,13 @@ module.exports = function (Domain, libs) {
                     }
                     else {
                         var message = '' + options.statusCode + ' : ' + body;
-                        ctxt.error(new Error(message));
+                        ctxt.error(message);
                         d.request(['app', 'error'], _.extend({}, globals, { error: message }), { timeout: 0.1 })
                             .spread(function (body, options) {
                                 if (options.statusCode == '200') {
                                     var errapp = body;
                                     if (!_.isFunction(errapp)) {
-                                        var message = 'Error app request did not return a start function.';
-                                        ctxt.send(['error', 'app', 'error'], [], new Error(message));
+                                        ctxt.send(['error', 'app', 'error'], [], 'Error app request did not return a start function.');
                                         return;
                                     }
                                     return Promise.resolve(closeApp())
@@ -113,9 +110,8 @@ module.exports = function (Domain, libs) {
                                     console.error('No application error handler.');
                                 }
                                 else {
-                                    var message = '' + options.statusCode + ' Bad error application response ' +  body;
                                     console.error(message);
-                                    ctxt.send(['error', 'app', 'error'], [], new Error(message));
+                                    ctxt.send(['error', 'app', 'error'], [], '' + options.statusCode + ' Bad error application response ' +  body);
                                     return;
                                 }
                             });
