@@ -45,7 +45,7 @@ module.exports = function (Domain, libs) {
                 })
                 .spread(function (body, options) {
                     // I don't need to start the app if the location has changed...
-                    if (options.statusCode == '200') {
+                    if (options.statusCode == 200) {
                         var app = body;
                         if (!_.isFunction(app)) {
                             ctxt.error('App request did not return a start function.');
@@ -62,10 +62,10 @@ module.exports = function (Domain, libs) {
                                 };
                             });
                     }
-                    else if (options.statusCode == '301'
-                             || options.statusCode == '503') {
+                    else if (options.statusCode == 301
+                             || options.statusCode == 503) {
                         var redirectRoute;
-                        if (options.statusCode == '301') {
+                        if (options.statusCode == 301) {
                             redirectRoute = body;
                         }
                         else if (!_.isEqual(subroute, indexRoute)) {
@@ -88,7 +88,7 @@ module.exports = function (Domain, libs) {
                         ctxt.error(message);
                         d.request(['app', 'error'], _.extend({}, globals, { error: message }), { timeout: 0.1 })
                             .spread(function (body, options) {
-                                if (options.statusCode == '200') {
+                                if (options.statusCode == 200) {
                                     var errapp = body;
                                     if (!_.isFunction(errapp)) {
                                         ctxt.send(['error', 'app', 'error'], [], 'Error app request did not return a start function.');
@@ -105,8 +105,7 @@ module.exports = function (Domain, libs) {
                                             };
                                         });
                                 }
-                                else if (options.statusCode == '503'
-                                         || options.statusCode == '408') {
+                                else if (options.statusCode == 504) {
                                     console.error('No application error handler.');
                                 }
                                 else {
