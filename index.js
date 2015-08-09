@@ -39,12 +39,15 @@ module.exports = function (Domain, libs) {
             if (currentHash() !== newHash) {
                 history.pushState(null, null, window.location.pathname + '#' + newHash);
             }
-            appLock = appLock
+            var thisLock = appLock = appLock
                 .then(function () {
                     return d.request(appRoute.concat(ctxt.params.subroute), globals, appOptions);
                 })
                 .spread(function (body, options) {
-                    // I don't need to start the app if the location has changed...
+                    if (appLock !== thisLock) {
+                        // a new navigation event occured before we could load the app
+                        return;
+                    }
                     if (options.statusCode == 200) {
                         var app = body;
                         if (!_.isFunction(app)) {
