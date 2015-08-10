@@ -27,7 +27,7 @@
   "homepage": "https://github.com/plediii/dual-navigator#readme",
   "devDependencies": {
     "bluebird": "^2.9.34",
-    "dualapi": "^1.1.1",
+    "dualapi": "^1.2.0",
     "istanbul": "^0.3.17",
     "lodash": "^3.10.1",
     "mocha": "^2.2.5",
