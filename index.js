@@ -1,6 +1,12 @@
 
 // var log = require('./log');
 
+var tryCtxtError = function (ctxt, message)  {
+    try {
+        ctxt.error(message);
+    } catch (ok) {}
+};
+
 module.exports = function (Domain, libs) {
     var _ = libs._;
     var Promise = libs.Promise;
@@ -91,7 +97,7 @@ module.exports = function (Domain, libs) {
                     }
                     else {
                         var message = '' + options.statusCode + ' : ' + body;
-                        ctxt.error(message);
+                        tryCtxtError(ctxt, message);
                         d.request(['app', 'error'], _.extend({}, globals, { error: message }), { timeout: 0.1 })
                             .spread(function (body, options) {
                                 if (options.statusCode == 200) {
