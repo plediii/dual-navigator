@@ -36,6 +36,31 @@ describe('navgiator', function () {
 
     describe('location hash', function () {
 
+        it('should navigate to the index if no route on start', function (done) {
+            window.history.pushState(null, null, 'somepage');
+            dual.once(['app', 'index'], function (msg) {
+                done();
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
+        it('should navigate to the index if no route on start, even with match', function (done) {
+            window.history.pushState(null, null, 'somepage');
+            dual.mount(['**'], function () {});
+            dual.once(['app', 'index'], function (msg) {
+                done();
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
         it('should navigate to the target app state on start', function (done) {
             window.history.pushState(null, null, 'somepage#navigate/here');
             dual.once(['app', 'navigate', 'here'], function (msg) {
