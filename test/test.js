@@ -745,6 +745,24 @@ describe('navgiator', function () {
             }).start();
         });
 
+        it('should not freeze navigation when there is no eror handler', function (done) {
+            dual = dualapi(); // make a new domain without error handler
+            dual.mount(['error', 'app', 'error'], function () {
+                done();
+            });
+            dual.mount(['app', 'start'], function (body, ctxt) {
+                ctxt.return('erro', { statusCode: 403 });
+            });
+            dual.mount(['app', 'error'], function (body, ctxt) {
+                ctxt.return(function () {}, { statusCode: 999 });
+            });
+            dual.navigator(window, {
+                appRoute: ['app']
+                , indexRoute: ['index']
+                , globals: {}
+            }).start();
+        });
+
         it('should execute error app', function (done) {
             dual.mount(['app', 'start'], function (body, ctxt) {
                 ctxt.return('erro', { statusCode: 403 });
