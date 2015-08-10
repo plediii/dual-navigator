@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "mocha",
-    "ci-test": "istanbul cover _mocha -- -R tap \"./test/*.js\" > test.tap && istanbul report clover"
+    "ci-test": "istanbul cover _mocha -- -R tap \"./test/*.js\" > test.tap && istanbul report clover",
+    "build-example": "./node_modules/browserify/bin/cmd.js example/example.js -o example/app.js"
   },
   "repository": {
     "type": "git",
@@ -32,5 +33,8 @@
     "lodash": "^3.10.1",
     "mocha": "^2.2.5",
     "tape": "^4.0.3"
+  },
+  "dependencies": {
+    "browserify": "^11.0.1"
   }
 }
