@@ -131,7 +131,12 @@ module.exports = function (Domain, libs) {
         });
 
         var go = function () {
-            d.send(['navigate'].concat(currentHash().split('/')), []);
+            var hash = currentHash();
+            if (hash.length === 0) {
+                d.send(['navigate'].concat(indexRoute), []);
+            } else {
+                d.send(['navigate'].concat(currentHash().split('/')), []);
+            }
         };
 
         return {
