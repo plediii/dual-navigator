@@ -65,11 +65,14 @@ domain.mount(['app', 'withcleanup'], function (body, ctxt) {
 });
 ```
 
+## Optional application specific cleanup
 The cleanup function may optionally return a `Promise` to be resolved
 before continuing loading the next application.  Finally, the optional
 `cleanup` function provided during navigator instantiation will be
 called, regardless of whether the app has its own cleanup function.
 
+
+## Normal navigator flow
 The normal navigator flow is as follows:
 
 1. User navigates to a hash
