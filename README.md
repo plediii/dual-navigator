@@ -71,6 +71,7 @@ before continuing loading the next application.  Finally, the optional
 called, regardless of whether the app has its own cleanup function.
 
 The normal navigator flow is as follows:
+
 1. User navigates to a hash
 2. Navigator requests application
 3. Navigator calls previous application cleanup
