@@ -1,6 +1,6 @@
 {
   "name": "dual-navigator",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Route browser applications with dualapi",
   "main": "index.js",
   "directories": {
