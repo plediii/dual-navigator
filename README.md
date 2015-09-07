@@ -1,4 +1,4 @@
-# dual-navigator [![Build Status](http://jenkins.plediii.net:8080/buildStatus/icon?job=dual-navigator master)](http://jenkins.plediii.net:8080/job/dual-navigator%20master/)
+# dual-navigator [![Build Status](https://travis-ci.org/plediii/dual-navigator.svg)](https://travis-ci.org/plediii/dual-navigator)
 
 [dualapi](https://github.com/plediii/dualapi) domains are already like
 a network of distributed HTTP servers extending into the browser.
@@ -45,7 +45,7 @@ to be called when the browser navigates to a window location with the
 same hash as the route:
 
 ```javascript
-domain.mount([app', 'index'], function (body, ctxt) {
+domain.mount(['app', 'index'], function (body, ctxt) {
    ctxt.return(function () {
      // render index application
    });
